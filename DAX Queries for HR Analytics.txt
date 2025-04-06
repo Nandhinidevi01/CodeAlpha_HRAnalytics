@@ -1,0 +1,67 @@
+ DAX Queries for HR Analytics Dashboard (on your dataset)
+🔹 1. Total Hires by Department
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'HRDataset_v14'[Department],
+    "Total Hires", COUNTROWS('HRDataset_v14')
+)
+ORDER BY [Total Hires] DESC
+
+🔹 2. Turnover Rate
+
+EVALUATE
+VAR TotalEmployees = COUNTROWS('HRDataset_v14')
+VAR EmployeesLeft = CALCULATE(
+    COUNTROWS('HRDataset_v14'),
+    NOT(ISBLANK('HRDataset_v14'[DateofTermination]))
+)
+RETURN
+ROW("Turnover Rate (%)", DIVIDE(EmployeesLeft, TotalEmployees, 0) * 100)
+
+🔹 3. Average Engagement Score by Department
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'HRDataset_v14'[Department],
+    "Avg Engagement", AVERAGE('HRDataset_v14'[EngagementSurvey])
+)
+
+🔹 4. Performance Score Count by Category
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'HRDataset_v14'[PerformanceScore],
+    "Count", COUNTROWS('HRDataset_v14')
+)
+ORDER BY [Count] DESC
+
+🔹 5. Average Absences by Department
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'HRDataset_v14'[Department],
+    "Avg Absences", AVERAGE('HRDataset_v14'[Absences])
+)
+
+🔹 6. Recruitment Source Effectiveness
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'HRDataset_v14'[RecruitmentSource],
+    "Total Hires", COUNTROWS('HRDataset_v14')
+)
+ORDER BY [Total Hires] DESC
+
+🔹 7. Top 5 Most Tenured Employees
+
+EVALUATE
+TOPN(
+    5,
+    ADDCOLUMNS(
+        'HRDataset_v14',
+        "Tenure (Years)", 
+        DATEDIFF('HRDataset_v14'[DateofHire], NOW(), YEAR)
+    ),
+    [Tenure (Years)], DESC
+)
